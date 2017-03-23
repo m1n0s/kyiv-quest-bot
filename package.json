@@ -13,6 +13,7 @@
   ],
   "author": "m1n0s",
   "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/m1n0s/kyiv-quest-bot.git" },
   "dependencies": {
     "babel": "^6.23.0",
     "node-telegram-bot-api": "^0.27.0"
