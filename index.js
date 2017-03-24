@@ -1,7 +1,12 @@
 import TelegramBot from 'node-telegram-bot-api';
-import token from './token';
+import GoogleMapsAPI from 'googlemaps';
 
-const bot = new TelegramBot(token, { polling: true });
+import { TELEGRAM_API_KEY, GOOGLE_MAPS_API_KEY } from './tokens';
+
+const bot = new TelegramBot(TELEGRAM_API_KEY, { polling: true });
+const map = new GoogleMapsAPI({
+  key: GOOGLE_MAPS_API_KEY,
+});
 
 bot.on('message', msg => {
   const chatId = msg.chat.id;
@@ -9,10 +14,30 @@ bot.on('message', msg => {
   const location = msg.location;
 
   if (location) {
-    console.log(location);
-  }
+    const { latitude, longitude } = location;
 
-  //bot.sendMessage(chatId, 'Received your message');
+    const reverseGeocodeParams = {
+      latlng: `${latitude},${longitude}`,
+      language: 'uk',
+    };
+
+    map.reverseGeocode(reverseGeocodeParams, (err, result) => {
+
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      if (result.status !== 'OK') {
+        return;
+      }
+
+      const bestResult = result.results[0];
+
+      console.log(bestResult.address_components);
+      bot.sendMessage(chatId, bestResult.formatted_address);
+    });
+  }
 });
 
 bot.onText(/\/loc/, msg => {
